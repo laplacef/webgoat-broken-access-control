@@ -1,0 +1,17 @@
+{
+  "name": "webgoat-broken-access-control",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hands-on walkthrough of the OWASP WebGoat Broken Access Control section, with annotated screenshots and intercepted requests.",
+  "license": "CC-BY-NC-SA-4.0",
+  "author": "laplacef",
+  "scripts": {
+    "start": "myst start",
+    "build": "myst build",
+    "build:html": "myst build --html",
+    "clean": "myst clean --all"
+  },
+  "devDependencies": {
+    "mystmd": "^1.6.0"
+  }
+}

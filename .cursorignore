@@ -1,0 +1,26 @@
+# MyST build output
+_build/
+
+# Node
+node_modules/
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# Claude Code runtime artifacts
+.claude/scheduled_tasks.lock
+.claude/*.tmp
+.claude/.cache/
