@@ -1,0 +1,8 @@
+/* Project-local style overrides. Loaded via site.options.style in myst.yml. */
+
+/* Label the article-theme date as "Last updated:" instead of a bare date.
+   Targets <time class="myst-fm-date-string"> rendered by the frontmatter block.
+   Bump project.date in myst.yml each time content is meaningfully revised. */
+time.myst-fm-date-string::before {
+  content: "Last updated: ";
+}
