@@ -28,6 +28,8 @@ project:
   toc:
     - file: index.md
       title: Overview
+    - file: content/insecure-direct-object-references.md
+      title: "Insecure Direct Object References"
     - file: CHANGELOG.md
       title: "Changelog"
 
