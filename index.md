@@ -10,9 +10,8 @@ exports:
 +++ { "part": "abstract" }
 This tutorial explores the exploitation of Broken Access Control vulnerabilities in WebGoat. Lessons in this series:
 
-- Hijack a Session _(coming soon)_
+- [Session Hijacking](./content/session-hijacking.md)
 - [Insecure Direct Object References](./content/insecure-direct-object-references.md)
-- Missing Function Level Access Control _(coming soon)_
 
 See the [Changelog](CHANGELOG.md) for post-release updates.
 +++

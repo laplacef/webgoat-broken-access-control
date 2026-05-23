@@ -17,17 +17,21 @@ project:
   subject: tutorial
   venue:
     title: Web Application Security
-    url: https://github.com/WebGoat/WebGoat
+    url: https://www.laplacef.me/work/web-application-security/
   keywords:
     - OWASP Top 10
     - Broken Access Control
     - Application Security
     - WebGoat
+    - mitmproxy
+    - Burp Suite
   github: https://github.com/laplacef/webgoat-broken-access-control
   date: 2026-05-20
   toc:
     - file: index.md
       title: Overview
+    - file: content/session-hijacking.md
+      title: "Session Hijacking"
     - file: content/insecure-direct-object-references.md
       title: "Insecure Direct Object References"
     - file: CHANGELOG.md
