@@ -20,6 +20,12 @@ Intercept and modify requests to access other users' profile information and to 
 
 Insecure direct object references (IDOR) are a class of broken access control vulnerability, listed as **API1:2023 Broken Object Level Authorization (BOLA)** in the OWASP API Security Top 10. They occur when a web application exposes an object identifier (in a URL path, query parameter, or response body) and trusts the client-supplied identifier without verifying that the authenticated user is allowed to act on that specific object. The consequence is unauthorized read or write of resources that belong to other users.
 
+:::{iframe} https://www.youtube-nocookie.com/embed/rloqMGcPMkI
+:width: 100%
+:::
+
+_Video: [PwnFunction](https://www.youtube.com/@PwnFunction)._
+
 ### Types of IDOR Attacks
 
 - **URL tampering.** The most common form. The attacker swaps the identifier in a URL or path parameter to reach a resource owned by someone else.
