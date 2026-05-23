@@ -7,6 +7,8 @@ exports:
     output: insecure-direct-object-references.pdf
 ---
 
+---
+
 ## Objective
 
 Intercept and modify requests to access other users' profile information and to edit values in the database.
@@ -196,7 +198,8 @@ It is critical to always be aware of the identifiers that are exposed in the URL
 
 ## References
 
-- [OWASP Insecure Direct Object References](https://owasp.org/www-community/vulnerabilities/Insecure_Direct_Object_References)
+- [OWASP Top 10 — A01:2025 Broken Access Control](https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/)
 - [OWASP API Security Top 10 — API1:2023 Broken Object Level Authorization](https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/)
 - [OWASP Cheat Sheet — Authorization](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)
-- [Mozilla Developer Network — Insecure Direct Object References](https://developer.mozilla.org/en-US/docs/Web/Security/Attacks/IDOR)
+- [CWE-639: Authorization Bypass Through User-Controlled Key](https://cwe.mitre.org/data/definitions/639.html)
+- [MDN — Insecure Direct Object References](https://developer.mozilla.org/en-US/docs/Web/Security/Attacks/IDOR)
