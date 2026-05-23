@@ -34,8 +34,6 @@ project:
       title: "Session Hijacking"
     - file: content/insecure-direct-object-references.md
       title: "Insecure Direct Object References"
-    - file: CHANGELOG.md
-      title: "Changelog"
 
 site:
   template: article-theme
