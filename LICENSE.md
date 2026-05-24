@@ -4,7 +4,7 @@ This repository is **dual-licensed** to separate author-driven content from buil
 
 | Component | License |
 |---|---|
-| Content — prose, diagrams, screenshots, walkthroughs under `content/`, `README.md`, and any other `.md` source files | [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
+| Content — prose, diagrams, screenshots, and case study material under `content/`, `README.md`, and any other `.md` source files | [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) |
 | Code — `myst.yml`, `package.json`, `mise.toml`, GitHub Actions workflows, custom CSS, and any other build/config files | [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) |
 
 Copyright © 2026 laplacef. All rights reserved except as licensed below.
@@ -38,4 +38,4 @@ The author retains all commercial rights to the content. CC BY-NC-SA 4.0 is non-
 
 ## Trademarks
 
-"WebGoat" and the WebGoat logo are property of their respective owners (the OWASP Foundation). This repository is an independent walkthrough and is not affiliated with or endorsed by OWASP or the WebGoat project.
+"WebGoat" and the WebGoat logo are property of their respective owners (the OWASP Foundation). This repository is an independent case study and is not affiliated with or endorsed by OWASP or the WebGoat project.

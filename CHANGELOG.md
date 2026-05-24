@@ -1,6 +1,6 @@
 ---
 title: "Changelog"
-description: "Post-release updates to the Broken Access Control walkthrough."
+description: "Post-release updates to the Broken Access Control case study."
 exports:
   - format: pdf
     template: plain_latex

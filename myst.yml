@@ -3,8 +3,8 @@ version: 1
 project:
   title: "Broken Access Control"
   short_title: "Broken Access Control"
-  subtitle: "Exploiting Broken Access Control vulnerabilities in WebGoat"
-  description: "Hands-on walkthrough of the OWASP WebGoat Broken Access Control section, with annotated screenshots and intercepted requests."
+  subtitle: "An empirical case study of OWASP A01:2025 against WebGoat"
+  description: "Empirical reproduction and source-level analysis of representative vulnerabilities from the OWASP WebGoat Broken Access Control section."
   banner: "https://bac.cdn.laplacef.me/banner.jpg"
   authors:
     - id: laplacef
@@ -14,17 +14,15 @@ project:
   license:
     content: CC-BY-NC-SA-4.0
     code: Apache-2.0
-  subject: tutorial
+  subject: case series
   venue:
     title: Web Application Security
     url: https://www.laplacef.me/work/web-application-security/
   keywords:
-    - OWASP Top 10
     - Broken Access Control
-    - Application Security
-    - WebGoat
-    - mitmproxy
-    - Burp Suite
+    - OWASP Top 10
+    - OWASP API Security Top 10
+    - Vulnerability Case Study
   github: https://github.com/laplacef/webgoat-broken-access-control
   date: 2026-05-20
   toc:
