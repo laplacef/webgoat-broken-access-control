@@ -1,6 +1,11 @@
 ---
 title: "Insecure Direct Object References"
 description: "Accessing other users' resources by tampering with identifiers exposed in the URL or response body."
+keywords:
+  - IDOR
+  - CWE-639
+  - OWASP API1:2023
+  - Broken Object Level Authorization
 exports:
   - format: pdf
     template: plain_latex
@@ -9,26 +14,11 @@ exports:
 
 ---
 
-## Objective
-
-Intercept and modify requests to access other users' profile information and to edit values in the database.
-
-## Requirements
-
-- **WebGoat image:** `webgoat/webgoat:v2025.3`
-- **Proxy tool:** `mitmproxy v12.2.0`
-
 ## Introduction
 
-Insecure direct object references (IDOR) are a class of broken access control vulnerability, listed as **API1:2023 Broken Object Level Authorization (BOLA)** in the OWASP API Security Top 10. They occur when a web application exposes an object identifier (in a URL path, query parameter, or response body) and trusts the client-supplied identifier without verifying that the authenticated user is allowed to act on that specific object. The consequence is unauthorized read or write of resources that belong to other users.
+Insecure direct object reference (IDOR) is a class of broken access control vulnerability, listed as **API1:2023 Broken Object Level Authorization (BOLA)** in the OWASP API Security Top 10. It occurs when a web application exposes an object identifier (in a URL path, query parameter, or response body) and trusts the client-supplied identifier without verifying that the authenticated user is allowed to act on that specific object. The consequence is unauthorized read or write of resources that belong to other users.
 
-:::{iframe} https://www.youtube-nocookie.com/embed/rloqMGcPMkI
-:width: 100%
-:::
-
-_Video: [PwnFunction](https://www.youtube.com/@PwnFunction)._
-
-### Types of IDOR Attacks
+### Forms of IDOR
 
 - **URL tampering.** The most common form. The attacker swaps the identifier in a URL or path parameter to reach a resource owned by someone else.
 - **Body or document manipulation.** The identifier lives in the request body (JSON field, form input, hidden field). Tampering with it has the same effect as URL tampering.
@@ -39,7 +29,15 @@ _Video: [PwnFunction](https://www.youtube.com/@PwnFunction)._
 - **Authorize every object access on the server.** For every request that touches an object, verify the authenticated user is allowed to perform the requested action on that specific object. This is the only control that closes IDOR; everything else is defense in depth.
 - **Use opaque, unguessable identifiers.** UUIDs or random tokens raise the cost of enumeration but do not replace authorization checks. An attacker who learns a single valid identifier still gets through if no authorization runs.
 
-## Walkthrough
+### Materials
+
+:::{include} _materials/webgoat.md
+:::
+
+:::{include} _materials/mitmproxy.md
+:::
+
+## Methods
 
 The attack flow has three phases: authenticate, discover that the profile endpoint leaks an identifier the UI never shows, then abuse that identifier to read and modify other users' profiles.
 
@@ -58,7 +56,7 @@ sequenceDiagram
     W-->>U: 200 OK, role updated
 :::
 
-The first part of the lab requires the user to authenticate using `tom` and `cat` for the username and password respectively. Simply entering the credentials and clicking the `Submit` button will authenticate the user.
+Authentication requires the credentials `tom` and `cat` for the username and password respectively. Submitting them through the login form establishes the session.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/01-login-form.png
 :alt: WebGoat IDOR lesson login form with credentials tom and cat entered
@@ -66,9 +64,9 @@ The first part of the lab requires the user to authenticate using `tom` and `cat
 :align: center
 ```
 
-After authenticating, **observe** what the application actually returns. The question to keep asking is: what does the UI show versus what the server sends back?
+After authentication, the application's responses diverge from what the UI presents. The operative question is what the server sends back versus what the UI renders.
 
-Clicking on the `View Profile` button will reveal the user's profile. In this case, it reveals three pieces of information through the UI: the user's `name`, `color`, and `size`.
+Clicking the `View Profile` button reveals the user's profile. The UI surfaces three pieces of information: the user's `name`, `color`, and `size`.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/02-profile-ui.png
 :alt: Profile panel rendered in the WebGoat UI showing only the name, color, and size fields
@@ -114,7 +112,7 @@ By testing the hypothesis, it is true that adding the known `userId` of `tom` to
 :align: center
 ```
 
-Confirming that `tom`'s own `userId` resolves through the path means the same mechanism can be turned against other accounts. Intercept the `View Profile` request, swap the `userId` for one that belongs to someone else, and the server returns their profile.
+Confirming that `tom`'s own `userId` resolves through the path means the same mechanism can be turned against other accounts. Intercepting the `View Profile` request and substituting a different account's `userId` causes the server to return that account's profile.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/08-view-profile-button.png
 :alt: View Profile button in the WebGoat IDOR lesson UI
@@ -130,7 +128,7 @@ Confirming that `tom`'s own `userId` resolves through the path means the same me
 
 Incrementing or decrementing the `userId` reveals the profile information of the next or previous user in the database. Successfully repeating this process could potentially reveal the profile information of all users in the database.
 
-The actual `userId` of the next user in the database is not known, therefore the request will need to be repeated until the next user is found. This can be done manually by incrementing the `userId` by one and adding it to the path until the next user is found. Alternatively, a script can be written to automate the process or a tool with this functionality can be used (e.g. [Burp Suite](https://portswigger.net/burp) or [mitmproxy](https://docs.mitmproxy.org/stable/mitmproxytutorial-replayrequests/)).
+The actual `userId` of the next user in the database is not known, therefore the request will need to be repeated until the next user is found. This can be done by incrementing the `userId` by one and adding it to the path until the next user is found.
 
 In this case, after replaying the request multiple times while simultaneously incrementing the `userId` by one, the path `/WebGoat/IDOR/profile/2342388` reveals the profile information of the user `Buffalo Bill`.
 
@@ -140,7 +138,7 @@ In this case, after replaying the request multiple times while simultaneously in
 :align: center
 ```
 
-Lastly, it may be possible to edit values in the database by completely manipulating the type of request and passing different values for known fields.
+Finally, the database state can be modified by changing the request method and supplying different values for known fields.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/11-edit-values-prompt.png
 :alt: WebGoat lesson prompt asking the user to modify values in another account's profile
@@ -148,9 +146,9 @@ Lastly, it may be possible to edit values in the database by completely manipula
 :align: center
 ```
 
-So far the lab has used `GET` to read profiles; the next step uses `PUT` to update one. By convention `GET` retrieves a representation of a resource without side effects, while `PUT` replaces the resource at a given path with the payload in the request body.
+All preceding requests used `GET` to read profiles; the next request uses `PUT` to update one. By convention `GET` retrieves a representation of a resource without side effects, while `PUT` replaces the resource at a given path with the payload in the request body.
 
-WebGoat models privilege as an inverse number: a lower `role` value means higher privilege. The lab's goal is to escalate `Buffalo Bill` by lowering their `role` from `4` to `1`, and to change their `color` to `red` as a side-effect that proves the write succeeded. This can be done by sending a `PUT` request to the `/WebGoat/IDOR/profile/2342388` endpoint with the following payload:
+WebGoat models privilege as an inverse number: a lower `role` value means higher privilege. The objective at this step is to escalate `Buffalo Bill` by lowering their `role` from `4` to `1`, and to change their `color` to `red` as a side-effect that proves the write succeeded. Sending a `PUT` request to the `/WebGoat/IDOR/profile/2342388` endpoint with the following payload performs the escalation:
 
 ```json
 {
@@ -192,9 +190,9 @@ The response from the server shows that the request was successful and the `role
 
 ## Conclusion
 
-Insecure direct object references (IDOR) is a type of broken access control vulnerability that allows attackers to access sensitive data or modify data without proper authorization. They occur when a web application allows users to access or modify objects directly by manipulating the object's identifier, either through the URL path or the request body.
+The demonstration produced both unauthorized reads and an unauthorized write against the WebGoat profile endpoint because neither control named in the introduction was present. The endpoint accepted a path-supplied `userId` without verifying that it belonged to the authenticated session, making every other user's profile reachable; sequential numeric identifiers reduced enumeration to a tractable counting exercise, converging on `Buffalo Bill` at `userId` `2342388`. Pivoting from `GET` to `PUT` against the same path lowered that account's `role` from `4` to `1`, confirming the absent ownership check applied to writes as well as reads.
 
-It is critical to always be aware of the identifiers that are exposed in the URL or response body and to always be suspicious of them. Additionally, it is important to always be aware of the type of request being made and the fields that are being passed in the request body.
+Of the two mitigations named at the outset, server-side per-object authorization is the load-bearing control: an explicit ownership assertion before the lookup and before the update would have closed both the read enumeration and the privilege-escalation write. Opaque identifiers function as defense in depth rather than a substitute for authorization. They would have raised the cost of enumeration, but on their own would still have admitted any client that learned a single valid identifier.
 
 ## References
 
