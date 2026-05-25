@@ -16,7 +16,7 @@ exports:
 
 ## Introduction
 
-Insecure direct object reference (IDOR) is a class of broken access control vulnerability, listed as **API1:2023 Broken Object Level Authorization (BOLA)** in the OWASP API Security Top 10. It occurs when a web application exposes an object identifier (in a URL path, query parameter, or response body) and trusts the client-supplied identifier without verifying that the authenticated user is allowed to act on that specific object. The consequence is unauthorized read or write of resources that belong to other users.
+Insecure direct object reference (IDOR) is a class of broken access control vulnerability, listed as **API1:2023 Broken Object Level Authorization (BOLA)** in the OWASP API Security Top 10 [@owasp-api-top10-2023-api1; @mdn-idor]. It occurs when a web application exposes an object identifier (in a URL path, query parameter, or response body) and trusts the client-supplied identifier without verifying that the authenticated user is allowed to act on that specific object. The consequence is unauthorized read or write of resources that belong to other users.
 
 ### Forms of IDOR
 
@@ -26,7 +26,7 @@ Insecure direct object reference (IDOR) is a class of broken access control vuln
 
 ### Mitigation Strategies
 
-- **Authorize every object access on the server.** For every request that touches an object, verify the authenticated user is allowed to perform the requested action on that specific object. This is the only control that closes IDOR; everything else is defense in depth.
+- **Authorize every object access on the server** [@owasp-cs-authorization]. For every request that touches an object, verify the authenticated user is allowed to perform the requested action on that specific object. This is the only control that closes IDOR; everything else is defense in depth.
 - **Use opaque, unguessable identifiers.** UUIDs or random tokens raise the cost of enumeration but do not replace authorization checks. An attacker who learns a single valid identifier still gets through if no authorization runs.
 
 ### Materials
@@ -146,7 +146,7 @@ Finally, the database state can be modified by changing the request method and s
 :align: center
 ```
 
-All preceding requests used `GET` to read profiles; the next request uses `PUT` to update one. By convention `GET` retrieves a representation of a resource without side effects, while `PUT` replaces the resource at a given path with the payload in the request body.
+All preceding requests used `GET` to read profiles; the next request uses `PUT` to update one. By convention `GET` retrieves a representation of a resource without side effects, while `PUT` replaces the resource at a given path with the payload in the request body [@rfc-9110].
 
 WebGoat models privilege as an inverse number: a lower `role` value means higher privilege. The objective at this step is to escalate `Buffalo Bill` by lowering their `role` from `4` to `1`, and to change their `color` to `red` as a side-effect that proves the write succeeded. Sending a `PUT` request to the `/WebGoat/IDOR/profile/2342388` endpoint with the following payload performs the escalation:
 
@@ -188,16 +188,77 @@ The response from the server shows that the request was successful and the `role
 :align: center
 ```
 
+## Discussion
+
+The two vulnerable handlers live in single-class controllers under `org/owasp/webgoat/lessons/idor/` at the `v2025.3` tag. [`IDORViewOtherProfile.completed`](https://github.com/WebGoat/WebGoat/blob/v2025.3/src/main/java/org/owasp/webgoat/lessons/idor/IDORViewOtherProfile.java) maps `GET /IDOR/profile/{userId}` ([](#idor-view-other)), and [`IDOREditOtherProfile.completed`](https://github.com/WebGoat/WebGoat/blob/v2025.3/src/main/java/org/owasp/webgoat/lessons/idor/IDOREditOtherProfile.java) maps `PUT /IDOR/profile/{userId}` ([](#idor-edit-other)). Both accept the path variable directly and pass it to `new UserProfile(userId)` to perform the lookup and (for the `PUT` handler) the field-level mutation, without comparing the path-supplied `userId` to the session-bound principal stored in `LessonSession` under the key `idor-authenticated-user-id`. The source comments name the omission explicitly: the view handler concedes that "secure code would ensure there was a horizontal access control check prior to dishing up the requested profile", and the edit handler is introduced with "accepting the user submitted ID and assuming it will be the same as the logged in userId and not checking for proper authorization".
+
+:::{code-block} java
+:label: idor-view-other
+:caption: Vulnerable `GET /IDOR/profile/{userId}` handler from `IDORViewOtherProfile`.
+
+@GetMapping(path = "/IDOR/profile/{userId}", produces = {"application/json"})
+@ResponseBody
+public AttackResult completed(@PathVariable("userId") String userId) {
+    // ...
+    UserProfile requestedProfile = new UserProfile(userId);
+    // secure code would ensure there was a horizontal access control check
+    // prior to dishing up the requested profile
+    // ...
+}
+:::
+
+:::{code-block} java
+:label: idor-edit-other
+:caption: Vulnerable `PUT /IDOR/profile/{userId}` handler from `IDOREditOtherProfile`.
+
+@PutMapping(path = "/IDOR/profile/{userId}", consumes = "application/json")
+@ResponseBody
+public AttackResult completed(
+    @PathVariable("userId") String userId,
+    @RequestBody UserProfile userSubmittedProfile) {
+
+    String authUserId = (String) userSessionData.getValue("idor-authenticated-user-id");
+    // this is where it starts ... accepting the user submitted ID and assuming
+    // it will be the same as the logged in userId and not checking for proper
+    // authorization
+    UserProfile currentUserProfile = new UserProfile(userId);
+    // ...
+    currentUserProfile.setColor(userSubmittedProfile.getColor());
+    currentUserProfile.setRole(userSubmittedProfile.getRole());
+}
+:::
+
+That the omission is structural rather than a framework limitation is evident from the sibling handler [`IDORViewOwnProfile.invoke`](https://github.com/WebGoat/WebGoat/blob/v2025.3/src/main/java/org/owasp/webgoat/lessons/idor/IDORViewOwnProfile.java) ([](#idor-view-own)), which maps `GET /IDOR/profile` with no path variable and uses the session-bound identity as the lookup parameter. The session-based identity is already present in the request context; the parameterized handlers simply ignore it in favor of the client-supplied path key. This is the defining shape of **CWE-639 (Authorization Bypass Through User-Controlled Key)** [@cwe-639]: the request carries the key, the server trusts the key, and no binding between the key and the authenticated principal is enforced before the privileged operation runs.
+
+:::{code-block} java
+:label: idor-view-own
+:caption: Safe sibling handler `IDORViewOwnProfile.invoke`, deriving identity from `LessonSession`.
+
+@GetMapping(path = {"/IDOR/own", "/IDOR/profile"}, produces = {"application/json"})
+@ResponseBody
+public Map<String, Object> invoke() {
+    String authUserId = (String) userSessionData.getValue("idor-authenticated-user-id");
+    UserProfile userProfile = new UserProfile(authUserId);
+    // ...
+}
+:::
+
+The counterfactual is a single guard at the top of each parameterized handler ([](#idor-counterfactual)), before the `UserProfile` is constructed from the path-supplied `userId`. For an endpoint scoped to per-user profile data, ownership equality is the correct rule, and the guard applies symmetrically to both the read and the write path. Cases with a legitimate cross-user mode (administrators editing other accounts) would extend the guard with a role check rather than weaken it. The fix is independent of the rest of the lesson logic and changes nothing about the request shape that the client sees.
+
+:::{code-block} java
+:label: idor-counterfactual
+:caption: Minimal ownership guard closing both the read enumeration and the privilege-escalation write.
+
+String authUserId = (String) userSessionData.getValue("idor-authenticated-user-id");
+if (!userId.equals(authUserId)) {
+    throw new AccessDeniedException("not authorized for this profile");
+}
+:::
+
+The taxonomy mapping follows directly. The weakness class is **CWE-639**, the user-controlled-key specialization of the more general CWE-285 (Improper Authorization) [@cwe-285]; CWE-639 is the better fit because the defining feature of the empirical finding is that a client-supplied key is trusted without authorization, not that authorization is misconfigured in some broader sense. The API-surface category is **OWASP API1:2023 Broken Object Level Authorization**, where the missing control is per-object rather than per-function. The umbrella entry is **OWASP A01:2025 Broken Access Control** [@owasp-top10-2025-a01].
+
 ## Conclusion
 
 The demonstration produced both unauthorized reads and an unauthorized write against the WebGoat profile endpoint because neither control named in the introduction was present. The endpoint accepted a path-supplied `userId` without verifying that it belonged to the authenticated session, making every other user's profile reachable; sequential numeric identifiers reduced enumeration to a tractable counting exercise, converging on `Buffalo Bill` at `userId` `2342388`. Pivoting from `GET` to `PUT` against the same path lowered that account's `role` from `4` to `1`, confirming the absent ownership check applied to writes as well as reads.
 
 Of the two mitigations named at the outset, server-side per-object authorization is the load-bearing control: an explicit ownership assertion before the lookup and before the update would have closed both the read enumeration and the privilege-escalation write. Opaque identifiers function as defense in depth rather than a substitute for authorization. They would have raised the cost of enumeration, but on their own would still have admitted any client that learned a single valid identifier.
-
-## References
-
-- [OWASP Top 10 — A01:2025 Broken Access Control](https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/)
-- [OWASP API Security Top 10 — API1:2023 Broken Object Level Authorization](https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/)
-- [OWASP Cheat Sheet — Authorization](https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html)
-- [CWE-639: Authorization Bypass Through User-Controlled Key](https://cwe.mitre.org/data/definitions/639.html)
-- [MDN — Insecure Direct Object References](https://developer.mozilla.org/en-US/docs/Web/Security/Attacks/IDOR)

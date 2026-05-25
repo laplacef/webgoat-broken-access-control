@@ -25,6 +25,8 @@ project:
     - Vulnerability Case Study
   github: https://github.com/laplacef/webgoat-broken-access-control
   date: 2026-05-20
+  bibliography:
+    - references.bib
   toc:
     - file: index.md
       title: Overview
