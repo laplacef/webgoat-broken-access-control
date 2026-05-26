@@ -12,6 +12,6 @@
     "clean": "myst clean --all"
   },
   "devDependencies": {
-    "mystmd": "^1.6.0"
+    "mystmd": "^1.9.1"
   }
 }
