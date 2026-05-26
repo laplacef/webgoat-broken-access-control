@@ -310,7 +310,7 @@ if (!userId.equals(authUserId)) {
 }
 :::
 
-The taxonomy mapping follows directly. The weakness class is **CWE-639**, the user-controlled-key specialization of the more general CWE-285 (Improper Authorization) [@cwe-285]; CWE-639 is the better fit because the defining feature of the empirical finding is that a client-supplied key is trusted without authorization, not that authorization is misconfigured in some broader sense. The API-surface category is **OWASP API1:2023 Broken Object Level Authorization**, where the missing control is per-object rather than per-function. The umbrella entry is **OWASP A01:2025 Broken Access Control** [@owasp-top10-2025-a01].
+The taxonomy mapping follows directly. The weakness class is **CWE-639**, the user-controlled-key specialization of the more general improper-authorization class CWE-285 [@cwe-285]; CWE-639 is the better fit because the defining feature of the empirical finding is that a client-supplied key is trusted without authorization, not that authorization is misconfigured in some broader sense. The API-surface category is **OWASP API1:2023 Broken Object Level Authorization**, where the missing control is per-object rather than per-function. The umbrella entry is **OWASP A01:2025 Broken Access Control** [@owasp-top10-2025-a01].
 
 ## Conclusion
 
