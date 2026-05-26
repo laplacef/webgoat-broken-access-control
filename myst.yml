@@ -27,6 +27,10 @@ project:
   date: 2026-05-20
   bibliography:
     - references.bib
+  exports:
+    - format: pdf
+      template: plain_latex
+      output: webgoat-broken-access-control.pdf
   toc:
     - file: index.md
       title: Overview
