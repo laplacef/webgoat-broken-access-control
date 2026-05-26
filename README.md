@@ -13,6 +13,7 @@ An empirical case series on **Broken Access Control** vulnerabilities, reproduce
 
 ## Case Studies
 
+- [Session Hijacking](content/session-hijacking.md). Predictable session identifier generation (CWE-330, CWE-340) and the keyspace collapse that follows from pairing a global counter with a wall-clock timestamp.
 - [Insecure Direct Object References](content/insecure-direct-object-references.md). Missing object-level authorization (CWE-639, API1:2023 BOLA) on a profile endpoint, permitting enumeration and modification of other users' records via path-supplied identifiers.
 
 ## Acknowledgments

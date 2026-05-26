@@ -41,7 +41,7 @@ The case series is bounded to vulnerabilities within the OWASP A01 (Broken Acces
 
 ## Case Studies
 
-- [Session Hijacking](./content/session-hijacking.md) — predictable session identifier generation (CWE-330) and the keyspace collapse that follows from pairing a global counter with a wall-clock timestamp.
+- [Session Hijacking](./content/session-hijacking.md) — predictable session identifier generation (CWE-330, CWE-340) and the keyspace collapse that follows from pairing a global counter with a wall-clock timestamp.
 - [Insecure Direct Object References](./content/insecure-direct-object-references.md) — missing object-level authorization (CWE-639, API1:2023 BOLA) on a profile endpoint that leaks the very identifier required to enumerate and modify other users' records.
 
 +++ { "part": "data_availability" }

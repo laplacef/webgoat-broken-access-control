@@ -4,6 +4,7 @@ description: "Predictable session identifiers and how they enable account takeov
 keywords:
   - Session Hijacking
   - CWE-330
+  - CWE-340
   - OWASP A07:2025
   - Session Management
 exports:
