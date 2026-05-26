@@ -16,20 +16,22 @@ exports:
 
 ## Introduction
 
+The case study empirically reproduces an insecure direct object reference vulnerability in WebGoat `v2025.3` by identifying weaknesses in the identifier generation logic and exploiting the keyspace collapse that follows from pairing a global counter with a wall-clock timestamp. The objective is to demonstrate the vulnerability and the mitigations in a controlled environment and shine a light on the importance of modern session management practices in the context of web application security.
+
 Insecure direct object reference (IDOR) is a class of broken access control vulnerability, listed as **API1:2023 Broken Object Level Authorization (BOLA)** in the OWASP API Security Top 10 [@owasp-api-top10-2023-api1; @mdn-idor]. It occurs when a web application exposes an object identifier (in a URL path, query parameter, or response body) and trusts the client-supplied identifier without verifying that the authenticated user is allowed to act on that specific object. The consequence is unauthorized read or write of resources that belong to other users.
 
-### Forms of IDOR
+IDOR presents in three forms:
 
 - **URL tampering.** The most common form. The attacker swaps the identifier in a URL or path parameter to reach a resource owned by someone else.
 - **Body or document manipulation.** The identifier lives in the request body (JSON field, form input, hidden field). Tampering with it has the same effect as URL tampering.
 - **File access.** The identifier maps to a file path or storage key. Predictable or directly-referenced paths let the attacker read files outside their own scope.
 
-### Mitigation Strategies
+Two controls mitigate IDOR:
 
 - **Authorize every object access on the server** [@owasp-cs-authorization]. For every request that touches an object, verify the authenticated user is allowed to perform the requested action on that specific object. This is the only control that closes IDOR; everything else is defense in depth.
 - **Use opaque, unguessable identifiers.** UUIDs or random tokens raise the cost of enumeration but do not replace authorization checks. An attacker who learns a single valid identifier still gets through if no authorization runs.
 
-### Materials
+## Materials
 
 :::{include} _materials/webgoat.md
 :::
@@ -39,7 +41,9 @@ Insecure direct object reference (IDOR) is a class of broken access control vuln
 
 ## Methods
 
-The attack flow has three phases: authenticate, discover that the profile endpoint leaks an identifier the UI never shows, then abuse that identifier to read and modify other users' profiles.
+This case study reproduces the IDOR vulnerability in the WebGoat profile endpoint at the pinned tag `v2025.3`. The investigation proceeds in three phases: authenticate against the lesson with the documented test credentials, intercept the `/IDOR/profile` request and inspect the response for fields the UI does not surface, then substitute the recovered identifier in subsequent requests to read and modify other accounts' profiles. Requests are observed through mitmproxy in reverse-proxy mode (see Materials). The success criterion is the unauthorized read of another account's profile and an unauthorized write that escalates that account's `role`.
+
+## Results
 
 :::{mermaid}
 sequenceDiagram
