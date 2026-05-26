@@ -41,11 +41,16 @@ Two controls mitigate IDOR:
 
 ## Methods
 
-This case study reproduces the IDOR vulnerability in the WebGoat profile endpoint at the pinned tag `v2025.3`. The investigation proceeds in three phases: authenticate against the lesson with the documented test credentials, intercept the `/IDOR/profile` request and inspect the response for fields the UI does not surface, then substitute the recovered identifier in subsequent requests to read and modify other accounts' profiles. Requests are observed through mitmproxy in reverse-proxy mode (see Materials). The success criterion is the unauthorized read of another account's profile and an unauthorized write that escalates that account's `role`.
+This case study reproduces the IDOR vulnerability in the WebGoat profile endpoint at the pinned tag `v2025.3`. The investigation proceeds in three phases: authenticate against the lesson with the documented test credentials, intercept the `/IDOR/profile` request and inspect the response for fields the UI does not surface, then substitute the recovered identifier in subsequent requests to read and modify other accounts' profiles. The read and write steps rely on standard HTTP method semantics [@rfc-9110], with `GET` retrieving the profile representation and `PUT` replacing it. Requests are observed through mitmproxy in reverse-proxy mode (see Materials). The success criterion is the unauthorized read of another account's profile and an unauthorized write that escalates that account's `role`.
 
 ## Results
 
-:::{mermaid}
+The exploit hinges on two observations: the profile response body carries an identifier the UI hides, and the parameterized endpoint returns any profile that identifier names. The full attack flow is summarized in [](#idor-attack-flow).
+
+:::{figure}
+:label: idor-attack-flow
+
+```{mermaid}
 sequenceDiagram
     autonumber
     participant U as Attacker
@@ -58,14 +63,20 @@ sequenceDiagram
     W-->>U: another user's profile
     U->>W: PUT /WebGoat/IDOR/profile/{userId} (privilege change)
     W-->>U: 200 OK, role updated
+```
+
+Attack flow against the IDOR profile endpoint, from authentication through unauthorized read and privilege escalation.
 :::
 
 Authentication requires the credentials `tom` and `cat` for the username and password respectively. Submitting them through the login form establishes the session.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/01-login-form.png
+:label: idor-login-form
 :alt: WebGoat IDOR lesson login form with credentials tom and cat entered
 :width: 100%
 :align: center
+
+Submitting `tom` / `cat` against the WebGoat IDOR lesson login form.
 ```
 
 After authentication, the application's responses diverge from what the UI presents. The operative question is what the server sends back versus what the UI renders.
@@ -73,86 +84,112 @@ After authentication, the application's responses diverge from what the UI prese
 Clicking the `View Profile` button reveals the user's profile. The UI surfaces three pieces of information: the user's `name`, `color`, and `size`.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/02-profile-ui.png
+:label: idor-profile-ui
 :alt: Profile panel rendered in the WebGoat UI showing only the name, color, and size fields
 :width: 100%
 :align: center
+
+The `View Profile` panel surfaces only `name`, `color`, and `size`.
 ```
 
 Inspecting the source code of the page reveals the endpoint that retrieves the profile: `GET /WebGoat/IDOR/profile`.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/03-source-endpoint.png
+:label: idor-source-endpoint
 :alt: Browser developer tools showing the page source with the GET /WebGoat/IDOR/profile endpoint highlighted
 :width: 100%
 :align: center
+
+Page source reveals the endpoint `GET /WebGoat/IDOR/profile` behind the `View Profile` button.
 ```
 
 Intercepting the endpoint and examining the response shows that the application is returning additional information that is not visible in the UI, including the user's `role` and `userId`.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/04-intercept-profile-get.png
+:label: idor-intercept-profile-get
 :alt: mitmproxy capture of the GET /WebGoat/IDOR/profile request
 :width: 100%
 :align: center
+
+The mitmproxy capture of the `GET /WebGoat/IDOR/profile` request.
 ```
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/05-response-hidden-fields.png
+:label: idor-response-hidden-fields
 :alt: Profile response body in mitmproxy showing extra role and userId fields beyond what the UI rendered
 :width: 100%
 :align: center
+
+The response body carries `role` and `userId` beyond what the UI surfaces.
 ```
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/06-submit-userid.png
+:label: idor-submit-userid
 :alt: WebGoat lesson answer form filled with the userId recovered from the intercepted response
 :width: 100%
 :align: center
+
+The lesson answer form accepts the `userId` recovered from the intercepted response.
 ```
 
 With the hidden `userId` exposed in the response body, it may be possible to access other users' profile information through path manipulation. The application is not enforcing server-side access control on the profile endpoint, nor does it use an opaque identifier that would resist guessing.
 
-By testing the hypothesis, it is true that adding the known `userId` of `tom` to the path reveals the profile information of their account.
+Adding `tom`'s own `userId` to the path reveals the profile information of their account.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/07-self-userid-path.png
+:label: idor-self-userid-path
 :alt: Profile response after appending tom's own userId to the request path, confirming the endpoint accepts a path-based identifier
 :width: 100%
 :align: center
+
+Appending `tom`'s own `userId` to the path returns the same profile, confirming the endpoint accepts a path-based identifier.
 ```
 
 Confirming that `tom`'s own `userId` resolves through the path means the same mechanism can be turned against other accounts. Intercepting the `View Profile` request and substituting a different account's `userId` causes the server to return that account's profile.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/08-view-profile-button.png
+:label: idor-view-profile-button
 :alt: View Profile button in the WebGoat IDOR lesson UI
 :width: 100%
 :align: center
+
+The `View Profile` button that triggers the parameterized profile request.
 ```
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/09-intercept-view-profile.png
+:label: idor-intercept-view-profile
 :alt: mitmproxy intercept of the View Profile request, paused so the path can be edited before forwarding
 :width: 100%
 :align: center
+
+The intercepted `View Profile` request, paused for path modification before forwarding.
 ```
 
-Incrementing or decrementing the `userId` reveals the profile information of the next or previous user in the database. Successfully repeating this process could potentially reveal the profile information of all users in the database.
+Incrementing or decrementing the `userId` reveals the profile information of the next or previous user in the database. Repeating this process enumerates additional profiles.
 
-The actual `userId` of the next user in the database is not known, therefore the request will need to be repeated until the next user is found. This can be done by incrementing the `userId` by one and adding it to the path until the next user is found.
-
-In this case, after replaying the request multiple times while simultaneously incrementing the `userId` by one, the path `/WebGoat/IDOR/profile/2342388` reveals the profile information of the user `Buffalo Bill`.
+The next user's `userId` is not known a priori; incrementing from `tom`'s known value converges on `/WebGoat/IDOR/profile/2342388`, which returns the profile of `Buffalo Bill`.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/10-enumerated-profile.png
+:label: idor-enumerated-profile
 :alt: Profile response for /WebGoat/IDOR/profile/2342388 showing Buffalo Bill's account data after enumerating userId values
 :width: 100%
 :align: center
+
+Substituting `2342388` in the path returns `Buffalo Bill`'s profile.
 ```
 
 Finally, the database state can be modified by changing the request method and supplying different values for known fields.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/11-edit-values-prompt.png
+:label: idor-edit-values-prompt
 :alt: WebGoat lesson prompt asking the user to modify values in another account's profile
 :width: 100%
 :align: center
+
+The lesson prompts for modification of another account's profile.
 ```
 
-All preceding requests used `GET` to read profiles; the next request uses `PUT` to update one. By convention `GET` retrieves a representation of a resource without side effects, while `PUT` replaces the resource at a given path with the payload in the request body [@rfc-9110].
-
-WebGoat models privilege as an inverse number: a lower `role` value means higher privilege. The objective at this step is to escalate `Buffalo Bill` by lowering their `role` from `4` to `1`, and to change their `color` to `red` as a side-effect that proves the write succeeded. Sending a `PUT` request to the `/WebGoat/IDOR/profile/2342388` endpoint with the following payload performs the escalation:
+WebGoat models privilege as an inverse number: a lower `role` value means higher privilege. Escalating `Buffalo Bill` therefore requires lowering their `role` from `4` to `1`; setting `color` to `red` in the same request serves as a side-effect that confirms the write succeeded. Sending a `PUT` request to the `/WebGoat/IDOR/profile/2342388` endpoint with the following payload performs the escalation:
 
 ```json
 {
@@ -167,29 +204,41 @@ WebGoat models privilege as an inverse number: a lower `role` value means higher
 The server is expecting a `json` object with the following fields: `role`, `color`, `size`, `name`, and `userId`. Therefore, all fields must be passed in the payload. Additionally, the `Content-Type` request header must be set to `application/json`.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/12-original-get.png
+:label: idor-original-get
 :alt: mitmproxy capture of the original GET request prior to method and body modification
 :width: 100%
 :align: center
+
+The original `GET` request captured before method rewriting.
 ```
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/13-modified-put.png
+:label: idor-modified-put
 :alt: Same request rewritten in mitmproxy as a PUT with a JSON body and Content-Type application/json
 :width: 100%
 :align: center
+
+The same request rewritten as a `PUT` with a JSON body and `Content-Type: application/json`.
 ```
 
 The response from the server shows that the request was successful and the `role` of `Buffalo Bill` was updated to `1` and the `color` was changed to `red`.
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/14-put-success-response.png
+:label: idor-put-success-response
 :alt: Server response confirming the PUT succeeded, returning Buffalo Bill's updated profile with role 1 and color red
 :width: 100%
 :align: center
+
+The server response confirms the write: `Buffalo Bill`'s `role` is now `1` and `color` is `red`.
 ```
 
 ```{figure} https://bac.cdn.laplacef.me/figures/insecure-direct-object-references/15-lesson-complete.png
+:label: idor-lesson-complete
 :alt: WebGoat lesson UI marking the profile-modification step complete
 :width: 100%
 :align: center
+
+The WebGoat lesson UI marks the profile-modification step complete.
 ```
 
 ## Discussion
