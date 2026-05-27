@@ -4,7 +4,7 @@
   "private": true,
   "description": "Hands-on walkthrough of the OWASP WebGoat Broken Access Control section, with annotated screenshots and intercepted requests.",
   "license": "CC-BY-NC-SA-4.0",
-  "author": "laplacef",
+  "author": "Francisco Laplace",
   "scripts": {
     "start": "myst start",
     "build": "myst build",
