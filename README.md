@@ -1,6 +1,7 @@
 # webgoat-broken-access-control
 
 [![Cases](https://img.shields.io/github/v/release/laplacef/webgoat-broken-access-control?label=cases&color=2962ff)](https://laplacef.github.io/webgoat-broken-access-control/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20407989.svg)](https://doi.org/10.5281/zenodo.20407989)
 [![WebGoat](https://img.shields.io/badge/WebGoat-v2025.3-ff6f00)](https://github.com/WebGoat/WebGoat)
 [![Burp Suite](https://img.shields.io/badge/Burp_Suite-v2025.10.6-3eaf7c)](https://portswigger.net/burp)
 [![mitmproxy](https://img.shields.io/badge/mitmproxy-v12.2.0-purple)](https://mitmproxy.org)
@@ -15,6 +16,12 @@ An empirical case series on **Broken Access Control** vulnerabilities, reproduce
 
 - [Session Hijacking](content/session-hijacking.md). Predictable session identifier generation (CWE-330, CWE-340) and the keyspace collapse that follows from pairing a global counter with a wall-clock timestamp.
 - [Insecure Direct Object References](content/insecure-direct-object-references.md). Missing object-level authorization (CWE-639, API1:2023 BOLA) on a profile endpoint that leaks the very identifier required to enumerate and modify other users' records.
+
+## How to Cite
+
+**DOI:** <https://doi.org/10.5281/zenodo.20407989>
+
+Per-release DOIs and pre-formatted citations are available on the [Zenodo deposit page](https://doi.org/10.5281/zenodo.20407989).
 
 ## Acknowledgments
 
