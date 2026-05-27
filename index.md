@@ -44,6 +44,12 @@ The case series is bounded to vulnerabilities within the OWASP A01 (Broken Acces
 - [Session Hijacking](./content/session-hijacking.md) — predictable session identifier generation (CWE-330, CWE-340) and the keyspace collapse that follows from pairing a global counter with a wall-clock timestamp.
 - [Insecure Direct Object References](./content/insecure-direct-object-references.md) — missing object-level authorization (CWE-639, API1:2023 BOLA) on a profile endpoint that leaks the very identifier required to enumerate and modify other users' records.
 
++++ { "part": "disclosure" }
+
+The target application under study (WebGoat at tag `v2025.3`) is a deliberately-vulnerable web application maintained by the OWASP Foundation for security training and research [@webgoat-v2025-3-source]. No production or third-party systems were tested in the course of this work, and all vulnerabilities reproduced are documented in the upstream codebase as intentional teaching artifacts. Coordinated disclosure is therefore not applicable; the source-level analyses cite the public, version-pinned WebGoat source as released.
+
++++
+
 +++ { "part": "data_availability" }
 
 Source materials for this case series are available at <https://github.com/laplacef/webgoat-broken-access-control>. Reference tool configurations for reproducing the cases live in the [`tools/`](https://github.com/laplacef/webgoat-broken-access-control/tree/main/tools) directory. Content is licensed under CC BY-NC-SA 4.0; build tooling and configuration are licensed under Apache-2.0. The target application analysed throughout is WebGoat at tag `v2025.3` [@webgoat-v2025-3-source].
