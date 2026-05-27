@@ -2,7 +2,7 @@
   "name": "webgoat-broken-access-control",
   "version": "0.1.0",
   "private": true,
-  "description": "Hands-on walkthrough of the OWASP WebGoat Broken Access Control section, with annotated screenshots and intercepted requests.",
+  "description": "An empirical case series on Broken Access Control vulnerabilities, reproduced and analysed against OWASP WebGoat at a pinned release.",
   "license": "CC-BY-NC-SA-4.0",
   "author": "Francisco Laplace",
   "scripts": {
