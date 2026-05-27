@@ -36,6 +36,25 @@ The build tooling, configuration files, and CSS in this repository are licensed 
 
 The author retains all commercial rights to the content. CC BY-NC-SA 4.0 is non-exclusive and does not bind the copyright holder. For commercial reuse — print editions, paid courses, translations, training-data licensing, or other commercial distribution — contact the author to negotiate separate terms.
 
+## Third-Party Assets
+
+Assets in this repository that originate from third parties are credited below per their respective licenses.
+
+### Favicon
+
+- **Source.** Twemoji `1f513.svg` (🔓 Open Lock).
+- **Author.** Copyright © 2020 Twitter, Inc. and other contributors.
+- **Original.** <https://github.com/twitter/twemoji/blob/master/assets/svg/1f513.svg>
+- **License.** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- **Modifications.** Converted from SVG to ICO format for browser-tab favicon delivery.
+
+### Banner
+
+- **Source.** Photograph by Milad Fakurian on Unsplash.
+- **Original.** <https://unsplash.com/photos/a-close-up-of-a-fish-seA-FPPXL-M>
+- **Author.** [Milad Fakurian](https://unsplash.com/@fakurian).
+- **License.** [Unsplash License](https://unsplash.com/license). Free for commercial and non-commercial use; attribution appreciated but not required.
+
 ## Trademarks
 
 "WebGoat" and the WebGoat logo are property of their respective owners (the OWASP Foundation). This repository is an independent case study and is not affiliated with or endorsed by OWASP or the WebGoat project.
