@@ -40,7 +40,8 @@ project:
     NIST: National Institute of Standards and Technology
     DOI: Digital Object Identifier
   github: https://github.com/laplacef/webgoat-broken-access-control
-  date: 2026-05-26
+  date: 2026-05-27
+  version: 0.1.0
   bibliography:
     - references.bib
   exports:
