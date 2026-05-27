@@ -24,7 +24,6 @@ project:
   subject: case series
   venue:
     title: Web Application Security
-    url: https://laplacef.me/work/web-application-security/
   keywords:
     - Broken Access Control
     - OWASP Top 10
