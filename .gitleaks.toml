@@ -1,0 +1,15 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Repo-specific false-positive allowlist"
+paths = [
+  # detect-secrets stores SHA1 hashes here that gitleaks would otherwise flag
+  # as generic-api-key candidates.
+  '''\.secrets\.baseline''',
+  # Lockfile integrity hashes are high-entropy by design.
+  '''package-lock\.json''',
+  # Build output and vendored deps.
+  '''_build/''',
+  '''node_modules/''',
+]

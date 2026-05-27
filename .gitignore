@@ -24,10 +24,8 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Pre-commit secret-scanner state
-.secrets.baseline
+# Pre-commit transient state
 .secrets.baseline.tmp
-.gitleaks.toml
 
 # Claude Code session context
 CLAUDE.md
