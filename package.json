@@ -2,7 +2,7 @@
   "name": "webgoat-broken-access-control",
   "version": "0.1.0",
   "private": true,
-  "description": "An empirical case series on Broken Access Control vulnerabilities, reproduced and analysed against OWASP WebGoat at a pinned release.",
+  "description": "A volume of empirical case studies on Broken Access Control vulnerabilities, reproduced and analysed against OWASP WebGoat at a pinned release, and part of The WebGoat Case Series.",
   "license": "CC-BY-NC-SA-4.0",
   "author": "Francisco Laplace",
   "scripts": {

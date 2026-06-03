@@ -10,7 +10,7 @@
 
 ---
 
-An empirical case series on **Broken Access Control** vulnerabilities, reproduced and analysed against OWASP WebGoat at a pinned release. Each case study pairs empirical demonstration of the exploit with source-level analysis of the WebGoat implementation, counterfactual identification of the missing or inadequate control, and explicit mapping to OWASP and CWE taxonomy.
+A volume of empirical case studies on **Broken Access Control** vulnerabilities, reproduced and analysed against OWASP WebGoat at a pinned release, and part of **The WebGoat Case Series**. Each case study pairs empirical demonstration of the exploit with source-level analysis of the WebGoat implementation, counterfactual identification of the missing or inadequate control, and explicit mapping to OWASP and CWE taxonomy.
 
 ## Case Studies
 
@@ -25,7 +25,7 @@ Per-release DOIs and pre-formatted citations are available on the [Zenodo deposi
 
 ## Acknowledgments
 
-Tools and target application referenced throughout the case series:
+Tools and target application referenced throughout this volume:
 
 - [WebGoat](https://github.com/WebGoat/WebGoat) (target application)
 - [Burp Suite](https://portswigger.net/burp) (interception proxy)

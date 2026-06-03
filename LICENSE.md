@@ -57,4 +57,4 @@ Assets in this repository that originate from third parties are credited below p
 
 ## Trademarks
 
-"WebGoat" and the WebGoat logo are property of their respective owners (the OWASP Foundation). This repository is an independent case study and is not affiliated with or endorsed by OWASP or the WebGoat project.
+"WebGoat" and the WebGoat logo are property of their respective owners (the OWASP Foundation). This repository is an independent volume in The WebGoat Case Series and is not affiliated with or endorsed by OWASP or the WebGoat project.

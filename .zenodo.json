@@ -1,6 +1,6 @@
 {
   "title": "WebGoat: Broken Access Control",
-  "description": "An empirical case series on broken access control vulnerabilities, reproduced and analysed against OWASP WebGoat at a pinned release. Each case study pairs empirical demonstration of the exploit with source-level analysis of the WebGoat implementation, counterfactual identification of the missing or inadequate control, and explicit mapping to OWASP and CWE taxonomy.",
+  "description": "A volume of empirical case studies on broken access control vulnerabilities, reproduced and analysed against OWASP WebGoat at a pinned release, and part of The WebGoat Case Series. Each case study pairs empirical demonstration of the exploit with source-level analysis of the WebGoat implementation, counterfactual identification of the missing or inadequate control, and explicit mapping to OWASP and CWE taxonomy.",
   "creators": [
     {
       "name": "Laplace, Francisco",
@@ -15,13 +15,11 @@
   "access_right": "open",
   "language": "eng",
   "keywords": [
-    "OWASP",
     "OWASP Top 10",
     "Broken Access Control",
     "Web Application Security",
     "Vulnerability Case Study",
-    "Case Series",
-    "WebGoat",
+    "The WebGoat Case Series",
     "Reproducibility",
     "CWE"
   ],
