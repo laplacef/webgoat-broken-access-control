@@ -1,0 +1,43 @@
+version: 2
+
+# Weekly grouped version updates, on top of the advisory-driven security
+# updates. Cooldown holds new releases a few days; security updates bypass it.
+#
+# No auto-merge: the site workflow runs only on push to main, so a pull
+# request has no check to gate a merge on. Requiring it would leave PRs
+# waiting on a status that never reports.
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 5
+    open-pull-requests-limit: 5
+
+  # mystmd build tooling (package.json + package-lock.json).
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      npm-minor-patch:
+        update-types:
+          - minor
+          - patch
+    cooldown:
+      default-days: 5
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 3
+    open-pull-requests-limit: 5
